@@ -1,0 +1,37 @@
+# docker-compose.yml (nihai hali)
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: my_service_db
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    # ports:
+    #   - "5432:5432" # Sadece hosttan erişim gerekiyorsa açık bırakılabilir, aksi takdirde kaldırılabilir.
+                    # Node.js uygulaması Docker içinde olduğu için bu satıra ihtiyacımız yok.
+
+  node_app: # Node.js servisimiz
+    build: ./node-app # node-app klasöründeki Dockerfile'ı kullan
+    restart: always
+    ports:
+      - "3001:3001" # Host'un 3001 portunu container'ın 3001 portuna yönlendir
+    environment: # Node.js uygulaması için ortam değişkenleri
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: my_service_db
+      DB_HOST: db # Docker ağı içinde veritabanı servisinin adı
+      DB_PORT: 5432
+      PORT: 3001
+      MOCK_MIN_DELAY_MS: 50 # Mock servis gecikmesi için ortam değişkenleri
+      MOCK_MAX_DELAY_MS: 500
+    depends_on: # Bu servisin 'db' servisi başladıktan sonra başlamasını bekler
+      - db
+
+volumes:
+  db_data:
