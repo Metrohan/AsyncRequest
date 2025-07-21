@@ -1,11 +1,9 @@
-// node-app/src/metrics.js
 const promClient = require('prom-client');
 const { getPool } = require('./db');
 
 const register = new promClient.Registry();
 promClient.collectDefaultMetrics({ register });
 
-// Özel Metrikler
 const httpRequestCounter = new promClient.Counter({
     name: 'http_requests_total',
     help: 'Toplam HTTP istek sayısı',
@@ -36,7 +34,6 @@ register.registerMetric(httpRequestDurationSeconds);
 register.registerMetric(processedRequestsCounter);
 register.registerMetric(dbConnectionPoolUsage);
 
-// DB bağlantı havuzu metriklerini güncelleme fonksiyonu
 const updateDbPoolMetrics = () => {
     const pool = getPool();
     if (pool) {

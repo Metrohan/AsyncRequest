@@ -1,10 +1,9 @@
-// node-app/src/app.js
-require('dotenv').config(); // Ortam değişkenlerini .env dosyasından yükle
+require('dotenv').config();
 
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { query } = require('./db');
-const { callThirdPartyService } = require('./mockService'); // Kendi mock servisimiz
+const { callThirdPartyService } = require('./mockService');
 const {
     register,
     httpRequestCounter,
@@ -16,7 +15,6 @@ const {
 const app = express();
 app.use(express.json());
 
-// --- Middleware'ler ---
 app.use((req, res, next) => {
     const end = httpRequestDurationSeconds.startTimer();
     res.on('finish', () => {
@@ -34,9 +32,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// --- Endpoint'ler ---
 
-// /submit (POST) endpoint'i
 app.post('/submit', async (req, res) => {
     const requestId = uuidv4();
     const payload = req.body;
@@ -60,7 +56,7 @@ app.post('/submit', async (req, res) => {
             let newStatus = 'failed';
 
             try {
-                // Kendi Node.js mock servisimiz doğrudan çağrılıyor, HTTP değil
+                
                 thirdPartyResponseData = await callThirdPartyService(requestId, payload);
                 newStatus = thirdPartyResponseData.status === 'SUCCESS' ? 'completed' : 'failed';
                 console.log(`[${requestId}] Mock servis yanıtı alındı:`, thirdPartyResponseData.status);
@@ -94,7 +90,6 @@ app.post('/submit', async (req, res) => {
     }
 });
 
-// /status/{id} (GET) endpoint'i
 app.get('/status/:id', async (req, res) => {
     const requestId = req.params.id;
 
@@ -121,14 +116,12 @@ app.get('/status/:id', async (req, res) => {
     }
 });
 
-// Prometheus metrik endpoint'i
 app.get('/metrics', async (req, res) => {
     updateDbPoolMetrics();
     res.setHeader('Content-Type', register.contentType);
     res.end(await register.metrics());
 });
 
-// --- Uygulamayı Başlatma ---
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Node.js servis ${PORT} portunda çalışıyor.`);

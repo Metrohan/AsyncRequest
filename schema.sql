@@ -1,4 +1,3 @@
--- schema.sql
 CREATE TABLE IF NOT EXISTS requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     status VARCHAR(50) NOT NULL,
