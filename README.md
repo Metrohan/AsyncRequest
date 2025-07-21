@@ -1,5 +1,7 @@
 # Asenkron İstek İşleme ve Performans İzleme Servisi
 
+Team A: Metehan GÜNEN, A. Baran D1KMEN, Neriman AKÇA, Mustafa YILDIRIM, H. Melih YEŞİL
+
 ## Genel Bakış
 
 Bu proje, modern web uygulamalarında sıkça karşılaşılan uzun süren işlemleri ("örn. harici API çağrıları") kullanıcıyı bekletmeden asenkron olarak işleyen bir web servisi geliştirmeyi amaçlamaktadır. Ayrıca, servisin sağlık durumunu ve performansını gerçek zamanlı olarak izleyebilmek için metrik toplama yetenekleri de entegre edilmiştir.
