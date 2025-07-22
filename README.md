@@ -1,6 +1,6 @@
 # Asenkron İstek İşleme ve Performans İzleme Servisi
 
-Team A: Metehan GÜNEN, A. Baran D1KMEN, Neriman AKÇA, Mustafa YILDIRIM, H. Melih YEŞİL
+Team A: Metehan GÜNEN, A. Baran DİKMEN, Neriman AKÇA, Mustafa YILDIRIM, H. Melih YEŞİL
 
 ## Genel Bakış
 
