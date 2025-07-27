@@ -58,15 +58,6 @@ Bu proje, modern web uygulamalarında sıkça karşılaşılan uzun süren işle
 ## Proje Yapısı
 
 ```
-Anladım. Yeni dosya düzeninizde Prometheus'un yerini merak ediyorsunuz.
-
-Prometheus, kendi başına ayrı bir hizmettir ve genellikle Node.js uygulamanızın kaynak kodunun bir parçası olarak doğrudan yer almaz. Prometheus'un yapılandırma dosyası (`prometheus.yml`) ise **projenizin kök dizininde**, yani `docker-compose.yml` dosyasının yanında bulunmalıdır. Bu, Prometheus'un Docker konteyneri içinde doğru yapılandırmayı okumasını sağlar.
-
-Node.js uygulamanızın metriklerini dışa aktaran `metrics.js` dosyası ise mevcut konumunda (`infrastructure/metrics.js`) kalabilir, çünkü bu dosya uygulamanın bir parçasıdır ve Prometheus'un okuyacağı metrikleri hazırlar.
-
-Güncellenmiş dosya düzeni aşağıdaki gibi olmalıdır:
-
-```
 AsyncRequest/
 ├── docker-compose.yml              # Docker servislerinin (DB, Uygulama, Prometheus, Grafana) orkestrasyonu
 ├── prometheus.yml                  # Prometheus'un hangi servislerden metrik toplayacağını yapılandıran dosya
@@ -89,7 +80,6 @@ AsyncRequest/
         │   └── requestService.js   # İş mantığını içeren servis katmanı (örn. istek işleme, durum güncelleme, domain nesnelerini kullanma)
         └── utils/
             └── errors.js           # Uygulama genelinde kullanılacak özel hata sınıfları veya hata yardımcı fonksiyonları
-```
 ```
 
 ## Kurulum ve Çalıştırma
