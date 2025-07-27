@@ -4,8 +4,8 @@ const { Pool } = require('pg'); //
 const {
     DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT,
     DB_POOL_MAX_CONNECTIONS, DB_POOL_IDLE_TIMEOUT_MILLIS
-} = require('../config/constants'); // Sabitler merkezi yerden alınıyor
-const { DatabaseError } = require('../utils/errors'); // Özel hata sınıfı
+} = require('../src/config/constants'); // Sabitler merkezi yerden alınıyor
+const { DatabaseError } = require('../src/utils/errors'); // Özel hata sınıfı
 
 // Veritabanı bağlantı havuzu oluşturuluyor
 const pool = new Pool({

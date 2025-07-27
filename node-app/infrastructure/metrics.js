@@ -2,7 +2,7 @@
 
 const promClient = require('prom-client'); //
 const { getDatabasePool } = require('./db'); // DB havuzunu doğru yerden al
-const { DB_METRICS_UPDATE_INTERVAL_MS } = require('../config/constants'); // Sabitler merkezi yerden alınıyor
+const { DB_METRICS_UPDATE_INTERVAL_MS } = require('../src/config/constants'); // Sabitler merkezi yerden alınıyor
 
 const register = new promClient.Registry(); //
 promClient.collectDefaultMetrics({ register }); //
