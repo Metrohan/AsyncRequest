@@ -58,27 +58,38 @@ Bu proje, modern web uygulamalarında sıkça karşılaşılan uzun süren işle
 ## Proje Yapısı
 
 ```
+Anladım. Yeni dosya düzeninizde Prometheus'un yerini merak ediyorsunuz.
+
+Prometheus, kendi başına ayrı bir hizmettir ve genellikle Node.js uygulamanızın kaynak kodunun bir parçası olarak doğrudan yer almaz. Prometheus'un yapılandırma dosyası (`prometheus.yml`) ise **projenizin kök dizininde**, yani `docker-compose.yml` dosyasının yanında bulunmalıdır. Bu, Prometheus'un Docker konteyneri içinde doğru yapılandırmayı okumasını sağlar.
+
+Node.js uygulamanızın metriklerini dışa aktaran `metrics.js` dosyası ise mevcut konumunda (`infrastructure/metrics.js`) kalabilir, çünkü bu dosya uygulamanın bir parçasıdır ve Prometheus'un okuyacağı metrikleri hazırlar.
+
+Güncellenmiş dosya düzeni aşağıdaki gibi olmalıdır:
+
+```
 AsyncRequest/
-├── docker-compose.yml
-├── schema.sql
-└── node-app/
-    ├── Dockerfile
-    ├── .env
-    ├── package.json
-    └── src/
-        ├── app.js
+├── docker-compose.yml              # Docker servislerinin (DB, Uygulama, Prometheus, Grafana) orkestrasyonu
+├── prometheus.yml                  # Prometheus'un hangi servislerden metrik toplayacağını yapılandıran dosya
+├── schema.sql                      # PostgreSQL veritabanı şeması tanımı
+└── node-app/                       # Ana Node.js uygulamasının bulunduğu klasör
+    ├── Dockerfile                  # Node.js uygulamasını Docker imajına dönüştürme talimatları
+    ├── .env                        # Uygulama ortam değişkenleri
+    ├── package.json                # Node.js proje bağımlılıkları ve scriptleri
+    └── src/                        # Ana uygulama kaynak kodları
+        ├── app.js                  # Express.js sunucusu, API endpointleri ve ana iş mantığı
         ├── config/
-        │   └── constants.js
+        │   └── constants.js        # Uygulama genelinde kullanılacak sabitler (örn. port, gecikmeler, durum tipleri)
         ├── domain/
-        │   └── request.js
+        │   └── request.js          # İstek nesnesinin veya modellerinin tanımları (örn. Request sınıfı/interface)
         ├── infrastructure/
-        │   ├── db.js
-        │   ├── metrics.js
-        │   └── mockService.js
+        │   ├── db.js               # Veritabanı etkileşimleri ve bağlantı havuzu yönetimi
+        │   ├── metrics.js          # Prometheus metriklerinin tanımları ve toplama mantığı (Node.js uygulamanızın metriklerini dışa aktaran kısım)
+        │   └── mockService.js      # Harici 3. parti servis çağrısını simüle eden modül
         ├── services/
-        │   └── requestService.js
+        │   └── requestService.js   # İş mantığını içeren servis katmanı (örn. istek işleme, durum güncelleme, domain nesnelerini kullanma)
         └── utils/
-            └── errors.js
+            └── errors.js           # Uygulama genelinde kullanılacak özel hata sınıfları veya hata yardımcı fonksiyonları
+```
 ```
 
 ## Kurulum ve Çalıştırma
