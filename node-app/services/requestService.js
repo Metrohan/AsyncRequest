@@ -9,8 +9,8 @@ const {
     REQUEST_STATUS_FAILED,
     REQUEST_STATUS_SUCCESS,
     REQUEST_STATUS_FAILURE
-} = require('../config/constants'); // Durum sabitleri
-const { DatabaseError, ExternalServiceError, NotFoundError } = require('../utils/errors'); // Hata sınıfları
+} = require('../src/config/constants'); // Durum sabitleri
+const { DatabaseError, ExternalServiceError, NotFoundError } = require('../src/utils/errors'); // Hata sınıfları
 const { processedRequestsCounter } = require('../infrastructure/metrics'); // Metrikler
 
 /**

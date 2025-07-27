@@ -11,8 +11,8 @@ const {
     httpRequestCounter,
     httpRequestDurationSeconds,
     updateDbPoolMetrics
-} = require('./infrastructure/metrics'); // Metrikler
-const RequestService = require('./services/requestService'); // Yeni RequestService
+} = require('../infrastructure/metrics'); // Metrikler
+const RequestService = require('../services/requestService'); // Yeni RequestService
 
 const app = express();
 // JSON body parser, limit belirtilebilir.

@@ -6,8 +6,8 @@ const {
     MOCK_SERVICE_SUCCESS_RATE,
     REQUEST_STATUS_SUCCESS,
     REQUEST_STATUS_FAILURE
-} = require('../config/constants'); // Sabitler merkezi yerden alınıyor
-const { ExternalServiceError } = require('../utils/errors'); // Özel hata sınıfı
+} = require('../src/config/constants'); // Sabitler merkezi yerden alınıyor
+const { ExternalServiceError } = require('../src/utils/errors'); // Özel hata sınıfı
 
 /**
  * Üçüncü parti servisi simüle eden fonksiyon.
