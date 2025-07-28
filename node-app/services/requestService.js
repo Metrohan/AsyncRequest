@@ -1,22 +1,17 @@
-// node-app/src/services/requestService.js
-
-const { executeQuery } = require('../infrastructure/db'); //
-const { callThirdPartyService } = require('../infrastructure/mockService'); //
-const Request = require('../domain/request'); // Değişmez Request nesnesi
+const { executeQuery } = require('../infrastructure/db');
+const { callThirdPartyService } = require('../infrastructure/mockService');
+const Request = require('../domain/request');
 const {
     REQUEST_STATUS_PENDING,
     REQUEST_STATUS_COMPLETED,
     REQUEST_STATUS_FAILED,
     REQUEST_STATUS_SUCCESS,
     REQUEST_STATUS_FAILURE
-} = require('../src/config/constants'); // Durum sabitleri
-const { DatabaseError, ExternalServiceError, NotFoundError } = require('../src/utils/errors'); // Hata sınıfları
-const { processedRequestsCounter } = require('../infrastructure/metrics'); // Metrikler
+} = require('../src/config/constants');
+const { DatabaseError, ExternalServiceError, NotFoundError } = require('../src/utils/errors');
+const { processedRequestsCounter } = require('../infrastructure/metrics');
 
-/**
- * İstekleri yöneten servis sınıfı.
- * İş mantığı ve veritabanı/servis etkileşimini kapsüller.
- */
+
 class RequestService {
     /**
      * Yeni bir istek oluşturur ve veritabanına kaydeder.
@@ -73,7 +68,6 @@ class RequestService {
             newStatus = REQUEST_STATUS_FAILED;
         } finally {
             try {
-                // Değişmezlik prensibi: Mevcut nesneyi güncellemek yerine yeni bir nesne oluştur
                 updatedRequest = initialRequest.withStatus(newStatus, thirdPartyResponseData);
 
                 await executeQuery(
@@ -84,7 +78,6 @@ class RequestService {
                 processedRequestsCounter.inc({ status: newStatus }); //
             } catch (dbUpdateError) {
                 console.error(`[${updatedRequest.getId()}] Database update error after processing:`, dbUpdateError.message); //
-                // Burada daha fazla hata yönetimi yapılabilir (örn: mesaj kuyruğuna atma)
             }
         }
     }
@@ -101,15 +94,14 @@ class RequestService {
             const result = await executeQuery(
                 'SELECT id, status, received_at, processed_at, payload, third_party_response FROM requests WHERE id = $1',
                 [requestId]
-            ); //
+            );
 
-            if (result.rows.length === 0) { //
-                console.log(`[${requestId}] Request not found.`); //
+            if (result.rows.length === 0) {
+                console.log(`[${requestId}] Request not found.`);
                 throw new NotFoundError('Request not found.');
             }
 
-            // Veritabanından gelen veriyi kullanarak değişmez Request nesnesi oluştur
-            const row = result.rows[0]; //
+            const row = result.rows[0];
             return new Request({
                 id: row.id,
                 payload: row.payload,
@@ -120,9 +112,9 @@ class RequestService {
             });
         } catch (error) {
             if (error instanceof NotFoundError) {
-                throw error; // Zaten doğru hata tipini fırlatıyor
+                throw error;
             }
-            throw new DatabaseError(`Failed to retrieve status for request ${requestId}.`, error); //
+            throw new DatabaseError(`Failed to retrieve status for request ${requestId}.`, error);
         }
     }
 }

@@ -1,8 +1,4 @@
-// node-app/src/domain/request.js
-
-// Değişmez tasarım prensibine göre Request sınıfı
 class Request {
-    // Özel alanlar (private fields) kullanarak kapsülleme sağlanır
     #id;
     #payload;
     #status;
@@ -22,23 +18,19 @@ class Request {
      */
     constructor({ id, payload, status, receivedAt = new Date(), processedAt = null, thirdPartyResponse = null }) {
         if (!id || !payload || !status) {
-            throw new Error('Request ID, payload, and status are required.'); // Zorunlu alan kontrolü
+            throw new Error('Request ID, payload, and status are required.');
         }
 
         this.#id = id;
-        // Payload'ı derin kopyalayarak ve dondurarak değişmezlik sağla
         this.#payload = Object.freeze(JSON.parse(JSON.stringify(payload)));
         this.#status = status;
         this.#receivedAt = receivedAt;
         this.#processedAt = processedAt;
-        // thirdPartyResponse'ı derin kopyalayarak ve dondurarak değişmezlik sağla
         this.#thirdPartyResponse = thirdPartyResponse ? Object.freeze(JSON.parse(JSON.stringify(thirdPartyResponse))) : null;
 
-        // Nesnenin kendisini dondurarak dışarıdan özellik ekleme/silme/değiştirme yapılmasını engelle
         Object.freeze(this);
     }
 
-    // Getter metodları (setter metodları yoktur)
     getId() { return this.#id; }
     getPayload() { return this.#payload; }
     getStatus() { return this.#status; }
@@ -49,9 +41,9 @@ class Request {
     /**
      * Yeni bir durumla yeni bir Request nesnesi döndürür.
      * "With" metodu prensibi.
-     * @param {string} newStatus - Yeni istek durumu.
-     * @param {object|null} [newThirdPartyResponse=null] - Yeni 3. parti yanıtı.
-     * @returns {Request} Yeni değişmez Request nesnesi.
+     * @param {string} newStatus
+     * @param {object|null} [newThirdPartyResponse=null]
+     * @returns {Request}
      */
     withStatus(newStatus, newThirdPartyResponse = null) {
         return new Request({
@@ -59,7 +51,7 @@ class Request {
             payload: this.#payload,
             status: newStatus,
             receivedAt: this.#receivedAt,
-            processedAt: new Date(), // Durum değiştiğinde processedAt'ı güncelle
+            processedAt: new Date(),
             thirdPartyResponse: newThirdPartyResponse
         });
     }
