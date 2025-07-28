@@ -22,6 +22,8 @@ Bu proje, modern web uygulamalarında sıkça karşılaşılan uzun süren işle
 * **PostgreSQL**
 * **Docker & Docker Compose**
 * **Prometheus (`prom-client`)**
+* **Grafana**
+* **k6**
 * **Diğer Kütüphaneler:** `pg`, `uuid`, `dotenv`, `axios`
 
 ## Güncellenen Mimari ve Özellikler
