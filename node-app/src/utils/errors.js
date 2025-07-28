@@ -1,5 +1,3 @@
-// node-app/src/utils/errors.js
-
 /**
  * Temel uygulama hatası sınıfı.
  * @class AppError
@@ -10,7 +8,6 @@ class AppError extends Error {
         super(message);
         this.name = this.constructor.name;
         this.statusCode = statusCode;
-        // Hata yakalama stack trace'ini daha okunur hale getirir
         Error.captureStackTrace(this, this.constructor);
     }
 }

@@ -6,8 +6,8 @@ Team A: Metehan GÜNEN, A. Baran DİKMEN, Neriman AKÇA, Mustafa YILDIRIM, H. Me
 
 Bu proje, modern web uygulamalarında sıkça karşılaşılan uzun süren işlemleri ("örn. harici API çağrıları") kullanıcıyı bekletmeden asenkron olarak işleyen bir web servisi geliştirmeyi amaçlamaktadır. Ayrıca, servisin sağlık durumunu ve performansını gerçek zamanlı olarak izleyebilmek için metrik toplama yetenekleri de entegre edilmiştir.
 
-> 📌 **Son Güncelleme (PR: `feature/implement-immutable-design`)**  
-> Uygulama kod tabanı, sürdürülebilirlik ve bakım kolaylığı hedefleri doğrultusunda yeniden düzenlenmiştir. Bu kapsamlı refactor çalışması ile immutable tasarım prensipleri, modüler yapı, gelişmiş hata yönetimi ve kod standartları entegre edilmiştir. Ayrıntılar için [Refactor PR içeriği](#güncellenen-mimari-ve-özellikler) bölümüne bakınız.
+> 📌 **Son Güncelleme (PR: `feature/k6-load-test-implementation`)**  
+> Web servisinin darboğaz, CPU kullanımı, Memory kullanımı, P50, P95, P99 gibi metriklerini gözlemleyebilmek için Grafana ve k6 entegre edilmiştir. Bu yenilikte Grafana ile grafik takibi kolaylaşmış olup k6 ile load testing esnasında hangi durumlarda darboğaz yaşandığı rahatlıkla gözlemlenebilmektedir.
 
 ## Proje Amacı
 
@@ -62,6 +62,8 @@ AsyncRequest/
 ├── docker-compose.yml              # Docker servislerinin (DB, Uygulama, Prometheus, Grafana) orkestrasyonu
 ├── prometheus.yml                  # Prometheus'un hangi servislerden metrik toplayacağını yapılandıran dosya
 ├── schema.sql                      # PostgreSQL veritabanı şeması tanımı
+└── load-tests/                     # Load testin bulunduğu klasör
+    └──submit-test.js               # k6 ile yapılmış Load Test talimatları                     
 └── node-app/                       # Ana Node.js uygulamasının bulunduğu klasör
     ├── Dockerfile                  # Node.js uygulamasını Docker imajına dönüştürme talimatları
     ├── .env                        # Uygulama ortam değişkenleri
@@ -109,10 +111,14 @@ docker compose up -d
 ### 3. `/metrics` → GET  
 Prometheus metrikleri görüntülenir.
 
+## Load Test
+
+```bash
+docker run --rm -i -v $PWD:/scripts grafana/k6 run /scripts/submit-test.js
+```
+
 ## Gelecek Planlar
 
-- Grafana görselleştirmesi
-- Load testi
 - Test kapsamı ve merkezi loglama
 - Dokümantasyon hazırlama ve raporlama
 ---
