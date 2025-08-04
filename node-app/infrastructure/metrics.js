@@ -30,10 +30,30 @@ const dbConnectionPoolUsage = new promClient.Gauge({
     labelNames: ['state']
 });
 
+const requestProcessingFailures = new promClient.Counter({
+    name: 'request_processing_failures_total',
+    help: 'Total number of asynchronous processing failures',
+    labelNames: ['stage', 'error']
+});
+
+const cpuUsageGauge = new promClient.Gauge({
+    name: 'process_cpu_usage_percent',
+    help: 'CPU usage of the Node.js process in percent (approx)'
+});
+
+const memoryUsageGauge = new promClient.Gauge({
+    name: 'process_memory_usage_bytes',
+    help: 'Memory usage of the Node.js process in bytes'
+});
+
+
 register.registerMetric(httpRequestCounter);
 register.registerMetric(httpRequestDurationSeconds);
 register.registerMetric(processedRequestsCounter);
 register.registerMetric(dbConnectionPoolUsage);
+register.registerMetric(requestProcessingFailures);
+register.registerMetric(cpuUsageGauge);
+register.registerMetric(memoryUsageGauge);
 
 /**
  * Veritabanı bağlantı havuzu metriklerini günceller.
@@ -53,12 +73,27 @@ const updateDbPoolMetrics = () => {
     }
 };
 
+const updateProcessMetrics = () => {
+    const memoryUsage = process.memoryUsage().rss;
+    const cpuUsage = process.cpuUsage(); // { user, system }
+
+    // % CPU tahmini: 1 saniyede geçen CPU süresi / gerçek süre
+    const userCPUms = cpuUsage.user / 1000;
+    const systemCPUms = cpuUsage.system / 1000;
+    const cpuPercent = (userCPUms + systemCPUms) / 1000; // yaklaşık %1 = 1 çekirdek kullanım
+
+    cpuUsageGauge.set(cpuPercent);
+    memoryUsageGauge.set(memoryUsage);
+};
+
 setInterval(updateDbPoolMetrics, DB_METRICS_UPDATE_INTERVAL_MS).unref();
+setInterval(updateProcessMetrics, DB_METRICS_UPDATE_INTERVAL_MS).unref();
 
 module.exports = {
     register,
     httpRequestCounter,
     httpRequestDurationSeconds,
     processedRequestsCounter,
-    updateDbPoolMetrics
+    updateDbPoolMetrics,
+    requestProcessingFailures
 };

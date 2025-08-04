@@ -10,7 +10,9 @@ const {
 } = require('../src/config/constants');
 const { DatabaseError, ExternalServiceError, NotFoundError } = require('../src/utils/errors');
 const { processedRequestsCounter } = require('../infrastructure/metrics');
+const PQueue = require('p-queue');
 
+const queue = new PQueue({ concurrency: 5 });
 
 class RequestService {
     /**
@@ -44,42 +46,56 @@ class RequestService {
      * Bu fonksiyon, API yanıtı hemen döndükten sonra asenkron olarak çalışır.
      * @param {Request} initialRequest - Başlangıçtaki değişmez Request nesnesi.
      */
-    async processRequestAsync(initialRequest) {
-        let updatedRequest = initialRequest;
-        let thirdPartyResponseData = null;
-        let newStatus = REQUEST_STATUS_FAILED;
+        async processRequestAsync(initialRequest) {
+        return queue.add(async () => {
+            let updatedRequest = initialRequest;
+            let thirdPartyResponseData = null;
+            let newStatus = REQUEST_STATUS_FAILED;
 
-        try {
-            thirdPartyResponseData = await callThirdPartyService(initialRequest.getId(), initialRequest.getPayload()); //
-            newStatus = thirdPartyResponseData.status === REQUEST_STATUS_SUCCESS ? REQUEST_STATUS_COMPLETED : REQUEST_STATUS_FAILED; //
-            console.log(`[${initialRequest.getId()}] Mock service response received: ${thirdPartyResponseData.status}`); //
-
-        } catch (error) {
-            console.error(`[${initialRequest.getId()}] Error calling mock service:`, error.message); //
-            if (error instanceof ExternalServiceError) {
-                thirdPartyResponseData = error.details || { error: true, message: error.message };
-            } else {
-                thirdPartyResponseData = {
-                    error: true,
-                    message: `Unexpected error during mock service call: ${error.message}`,
-                    details: error.stack
-                };
-            }
-            newStatus = REQUEST_STATUS_FAILED;
-        } finally {
             try {
-                updatedRequest = initialRequest.withStatus(newStatus, thirdPartyResponseData);
-
-                await executeQuery(
-                    'UPDATE requests SET status = $1, third_party_response = $2, processed_at = $3 WHERE id = $4',
-                    [updatedRequest.getStatus(), updatedRequest.getThirdPartyResponse(), updatedRequest.getProcessedAt(), updatedRequest.getId()]
+                thirdPartyResponseData = await callThirdPartyService(
+                    initialRequest.getId(),
+                    initialRequest.getPayload()
                 );
-                console.log(`[${updatedRequest.getId()}] Request status updated to '${newStatus}'.`); //
-                processedRequestsCounter.inc({ status: newStatus }); //
-            } catch (dbUpdateError) {
-                console.error(`[${updatedRequest.getId()}] Database update error after processing:`, dbUpdateError.message); //
+
+                newStatus = thirdPartyResponseData.status === REQUEST_STATUS_SUCCESS
+                    ? REQUEST_STATUS_COMPLETED
+                    : REQUEST_STATUS_FAILED;
+
+                console.log(`[${initialRequest.getId()}] Mock service response received: ${thirdPartyResponseData.status}`);
+            } catch (error) {
+                console.error(`[${initialRequest.getId()}] Error calling mock service:`, error.message);
+                if (error instanceof ExternalServiceError) {
+                    thirdPartyResponseData = error.details || { error: true, message: error.message };
+                } else {
+                    thirdPartyResponseData = {
+                        error: true,
+                        message: `Unexpected error during mock service call: ${error.message}`,
+                        details: error.stack
+                    };
+                }
+            } finally {
+                try {
+                    updatedRequest = initialRequest.withStatus(newStatus, thirdPartyResponseData);
+
+                    await executeQuery(
+                        'UPDATE requests SET status = $1, third_party_response = $2, processed_at = $3 WHERE id = $4',
+                        [
+                            updatedRequest.getStatus(),
+                            updatedRequest.getThirdPartyResponse(),
+                            updatedRequest.getProcessedAt(),
+                            updatedRequest.getId()
+                        ]
+                    );
+
+                    console.log(`[${updatedRequest.getId()}] Request status updated to '${newStatus}'.`);
+                    processedRequestsCounter.inc({ status: newStatus });
+
+                } catch (dbUpdateError) {
+                    console.error(`[${updatedRequest.getId()}] Database update error after processing:`, dbUpdateError.message);
+                }
             }
-        }
+        });
     }
 
     /**

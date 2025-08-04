@@ -22,7 +22,7 @@ async function callThirdPartyService(requestId, payload) {
         const delay = Math.floor(Math.random() * (MOCK_SERVICE_MAX_DELAY_MS - MOCK_SERVICE_MIN_DELAY_MS + 1)) + MOCK_SERVICE_MIN_DELAY_MS;
 
         setTimeout(() => {
-            const success = Math.random() < MOCK_SERVICE_SUCCESS_RATE;
+            const success = true;
             const response = {
                 status: success ? REQUEST_STATUS_SUCCESS : REQUEST_STATUS_FAILURE,
                 message: success ? 'Operation completed successfully.' : 'An unexpected error occurred.',

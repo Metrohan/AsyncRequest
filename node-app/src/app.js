@@ -8,9 +8,12 @@ const {
     register,
     httpRequestCounter,
     httpRequestDurationSeconds,
-    updateDbPoolMetrics
+    updateDbPoolMetrics,
+    requestProcessingFailures
 } = require('../infrastructure/metrics');
 const RequestService = require('../services/requestService');
+const logger = require('./utils/logger');
+const validatePayload = require('../validators/submitValidator');
 
 const app = express();
 app.use(express.json({ limit: HTTP_REQUEST_BODY_LIMIT }));
@@ -48,8 +51,13 @@ app.post('/submit', async (req, res, next) => {
     const payload = req.body;
 
     if (!payload || Object.keys(payload).length === 0) {
-        console.warn(`[${requestId}] Empty or missing payload: /submit`);
+        logger.warn(`[${requestId}] Empty or missing payload: /submit`);
         return next(new InvalidInputError('Request payload cannot be empty.'));
+    }
+
+    const { valid, errors } = validatePayload(payload);
+    if (!valid) {
+        return next(new InvalidInputError('Invalid payload structure.', errors));
     }
 
     try {
@@ -62,7 +70,8 @@ app.post('/submit', async (req, res, next) => {
 
         requestService.processRequestAsync(initialRequest)
             .catch(error => {
-                console.error(`[${requestId}] Asynchronous processing failed:`, error.message, error.stack);
+                logger.error(`[${requestId}] Async processing failed: ${error.message}`);
+                requestProcessingFailures.inc({ stage: 'processRequest', error: error.name });
             });
 
     } catch (error) {
@@ -111,23 +120,23 @@ app.get('/metrics', async (req, res, next) => {
 
 app.use((err, req, res, next) => {
     if (err instanceof InvalidInputError) {
-        console.warn(`Client Error (400) on ${req.method} ${req.path}: ${err.message}`, err.details);
+        logger.warn(`Client Error (400) on ${req.method} ${req.path}: ${err.message}`, err.details);
         return res.status(err.statusCode).json({ error: err.message, details: err.details });
     } else if (err instanceof NotFoundError) {
-        console.warn(`Client Error (404) on ${req.method} ${req.path}: ${err.message}`);
+        logger.warn(`Client Error (404) on ${req.method} ${req.path}: ${err.message}`);
         return res.status(err.statusCode).json({ error: err.message });
     } else if (err instanceof AppError) {
-        console.error(`Application Error (${err.statusCode}) on ${req.method} ${req.path}: ${err.message}`, err.stack);
+        logger.error(`Application Error (${err.statusCode}) on ${req.method} ${req.path}: ${err.message}`, err.stack);
         return res.status(err.statusCode).json({ error: 'Internal Server Error', message: err.message });
     } else {
-        console.error(`Unhandled Server Error (500) on ${req.method} ${req.path}:`, err);
+        logger.error(`Unhandled Server Error (500) on ${req.method} ${req.path}:`, err);
         return res.status(500).json({ error: 'Internal Server Error', message: 'An unexpected error occurred.' });
     }
 });
 
 app.listen(APP_PORT, () => {
-    console.log(`Node.js service running on port ${APP_PORT}.`);
-    console.log(`Prometheus metrics: http://localhost:${APP_PORT}/metrics`);
+    logger.info(`Node.js service running on port ${APP_PORT}.`);
+    logger.info(`Prometheus metrics: http://localhost:${APP_PORT}/metrics`);
 });
 
 module.exports = app;
