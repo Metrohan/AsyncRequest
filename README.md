@@ -99,8 +99,8 @@ AsyncRequest/
 │   ├── package-lock.json                  # Bağımlılık kilidi                
 ├── prometheus.yml                         # Prometheus yapılandırması
 ├── schema.sql                             # PostgreSQL şema tanımı
-├── README.md                              # Ana dokümantasyon
-└── readme_updated.md                      # Güncellenmiş README versiyonu
+└── README.md                              # Ana dokümantasyon
+
 
 ```
 
