@@ -6,13 +6,13 @@ Team A: Metehan GÜNEN, A. Baran DİKMEN, Neriman AKÇA, Mustafa YILDIRIM, H. Me
 
 Bu proje, modern web uygulamalarında sıkça karşılaşılan uzun süren işlemleri ("örn. harici API çağrıları") kullanıcıyı bekletmeden asenkron olarak işleyen bir web servisi geliştirmeyi amaçlamaktadır. Ayrıca, servisin sağlık durumunu ve performansını gerçek zamanlı olarak izleyebilmek için metrik toplama yetenekleri de entegre edilmiştir.
 
-> 📌 **Son Güncelleme (PR: `feature/k6-load-test-implementation`)**  
-> Web servisinin darboğaz, CPU kullanımı, Memory kullanımı, P50, P95, P99 gibi metriklerini gözlemleyebilmek için Grafana ve k6 entegre edilmiştir. Bu yenilikte Grafana ile grafik takibi kolaylaşmış olup k6 ile load testing esnasında hangi durumlarda darboğaz yaşandığı rahatlıkla gözlemlenebilmektedir.
+> 📌 **Son Güncelleme (PR: `feature/k6-load-test-optimization`)**  
+> K6 test senaryosu 202 durum kodunu tanıyacak şekilde optimize edildi. Gönderilen isteklerin sonucunu kontrol eden `status` endpoint'i için, arka planda işlem tamamlanana kadar tekrar eden sorgular (polling) eklendi. Bu sayede daha doğru başarı oranı hesaplandı ve önceki check hataları giderildi. Ayrıca Grafana üzerinden izlenebilen P95/P99 gibi uç değer metriklerine daha sağlıklı veri akışı sağlandı.
 
 ## Proje Amacı
 
 * **Asenkron İşleme:** Gelen istekleri hızlıca kabul edip, asıl işleme mantığını arka plana taşıyarak kullanıcı deneyimini iyileştirmek.
-* **Durum Takibi:** Arka planda işlenen isteklerin mevcut durumunu sorgulayabilme yeteneği sağlamak.
+* **Durum Takibi:** Arka planda işlenilen isteklerin mevcut durumunu sorgulayabilme yeteneği sağlamak.
 * **Performans İzleme:** Uygulama performansını ve kaynak kullanımını izlemek için Prometheus metriklerini toplamak ve sunmak.
 * **Docker Kullanımı:** Tüm bileşenleri (Node.js uygulaması, PostgreSQL veritabanı) izole, tutarlı ve taşınabilir Docker konteynerleri içinde çalıştırmak.
 
@@ -61,73 +61,69 @@ Bu proje, modern web uygulamalarında sıkça karşılaşılan uzun süren işle
 
 ```
 AsyncRequest/
-├── docker-compose.yml              # Docker servislerinin (DB, Uygulama, Prometheus, Grafana) orkestrasyonu
-├── prometheus.yml                  # Prometheus'un hangi servislerden metrik toplayacağını yapılandıran dosya
-├── schema.sql                      # PostgreSQL veritabanı şeması tanımı
-└── load-tests/                     # Load testin bulunduğu klasör
-    └──submit-test.js               # k6 ile yapılmış Load Test talimatları                     
-└── node-app/                       # Ana Node.js uygulamasının bulunduğu klasör
-    ├── Dockerfile                  # Node.js uygulamasını Docker imajına dönüştürme talimatları
-    ├── .env                        # Uygulama ortam değişkenleri
-    ├── package.json                # Node.js proje bağımlılıkları ve scriptleri
-    └── src/                        # Ana uygulama kaynak kodları
-        ├── app.js                  # Express.js sunucusu, API endpointleri ve ana iş mantığı
-        ├── config/
-        │   └── constants.js        # Uygulama genelinde kullanılacak sabitler (örn. port, gecikmeler, durum tipleri)
-        ├── domain/
-        │   └── request.js          # İstek nesnesinin veya modellerinin tanımları (örn. Request sınıfı/interface)
-        ├── infrastructure/
-        │   ├── db.js               # Veritabanı etkileşimleri ve bağlantı havuzu yönetimi
-        │   ├── metrics.js          # Prometheus metriklerinin tanımları ve toplama mantığı (Node.js uygulamanızın metriklerini dışa aktaran kısım)
-        │   └── mockService.js      # Harici 3. parti servis çağrısını simüle eden modül
-        ├── services/
-        │   └── requestService.js   # İş mantığını içeren servis katmanı (örn. istek işleme, durum güncelleme, domain nesnelerini kullanma)
-        └── utils/
-            └── errors.js           # Uygulama genelinde kullanılacak özel hata sınıfları veya hata yardımcı fonksiyonları
+├── load-tests/
+│   └── submit-test.js                     # K6 ile yük testi senaryosu
+│
+├── node-app/
+│   ├── domain/
+│   │   └── request.js                     # Domain nesnesi tanımı
+│   │
+│   ├── handlers/
+│   │   ├── status.js                      # /status handler
+│   │   └── submit.js                      # /submit handler
+│   │
+│   ├── infrastructure/
+│   │   ├── db.js                          # Veritabanı bağlantısı
+│   │   ├── metrics.js                     # Prometheus metrik tanımları
+│   │   └── mockService.js                 # Harici servis simülasyonu
+│   │
+│   ├── services/
+│   │   └── requestService.js              # İş mantığı servisi
+│   │
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── constants.js               # Sabitler
+│   │   │
+│   │   └── utils/
+│   │       ├── errors.js                  # Özel hata sınıfları
+│   │       └── logger.js                  # Loglama mantığı
+│   │
+│   ├── validators/
+│   │   └── submitValidator.js             # Submit için doğrulayıcı
+│   │
+│   ├── app.js                             # Express sunucusu (main)
+│   ├── .env                               # Ortam değişkenleri
+│   ├── Dockerfile                         # Node.js Docker yapılandırması
+│   ├── docker-compose.yml                 # Tüm bileşenlerin orkestrasyonu
+│   ├── package.json                       # Bağımlılıklar ve script'ler
+│   ├── package-lock.json                  # Bağımlılık kilidi                
+├── prometheus.yml                         # Prometheus yapılandırması
+├── schema.sql                             # PostgreSQL şema tanımı
+├── README.md                              # Ana dokümantasyon
+└── readme_updated.md                      # Güncellenmiş README versiyonu
+
 ```
 
-## Kurulum ve Çalıştırma
-
-### Önkoşullar
-
-* Node.js
-* Git
-* Docker & Docker Compose
-
-### Adımlar
-
-```bash
-git clone https://github.com/Metrohan/AsyncRequest.git
-cd AsyncRequest
-docker compose up -d
-```
-
-## Servisi Test Etme
-
-### 1. `/submit` → POST  
-İstek başlatır, `requestId` döner.
-
-### 2. `/status/{id}` → GET  
-İstek durumu sorgulanır: `pending`, `completed`, `failed`
-
-### 3. `/metrics` → GET  
-Prometheus metrikleri görüntülenir.
 
 ## Load Test
+
+Yük testi senaryosu `k6` ile yazılmıştır. `submit-test.js` dosyasında:
+
+- `POST /submit` çağrısı 202 döndüğünde geçerli sayılır.
+- Dönen `requestId`, işlem tamamlanana kadar `GET /status/:id` ile 5 defaya kadar sorgulanır.
+- Test sırasında polling uygulanarak başarı durumları daha doğru şekilde belirlenir.
 
 ```bash
 docker run --rm -i -v ${PWD}:/scripts grafana/k6 run /scripts/submit-test.js
 ```
 
+> ✅ Gözlemlenen İyileştirmeler:
+> - `check failed` oranı azaldı
+> - `status` endpoint'ine zamanında istek gönderilerek gerçek 200 yanıtları alınabildi
+> - Prometheus üzerinden gözlemlenen `http_request_duration_seconds` metrikleri, `histogram_quantile` ile P95/P99 latency hesaplamalarına daha doğru veri sağladı
+
 ## Gelecek Planlar
 
 - Test kapsamı ve merkezi loglama
 - Dokümantasyon hazırlama ve raporlama
----
 
-## Gözden Geçirme Notları
-
-- `Request` sınıfındaki immutable yapı detaylarını inceleyin.
-- `src/services/requestService.js` içindeki iş mantığını gözden geçirin.
-- `src/utils/errors.js` ile hata yönetimi netleşmiştir.
-- Testler ilerleyen sürümlerde genişletilecektir.
