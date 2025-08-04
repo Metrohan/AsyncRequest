@@ -116,7 +116,7 @@ Prometheus metrikleri görüntülenir.
 ## Load Test
 
 ```bash
-docker run --rm -i -v $PWD:/scripts grafana/k6 run /scripts/submit-test.js
+docker run --rm -i -v ${PWD}:/scripts grafana/k6 run /scripts/submit-test.js
 ```
 
 ## Gelecek Planlar
