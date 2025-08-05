@@ -20,6 +20,9 @@
     "uuid": "^11.1.0",
     "ajv": "^8.17.1",
     "p-queue": "^8.1.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "tiny-async-pool": "^2.1.0",
+    "pino": "^9.2.0",
+    "ajv-formats": "^3.0.1"
   }
 }

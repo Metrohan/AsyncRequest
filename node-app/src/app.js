@@ -39,7 +39,6 @@ app.use((req, res, next) => {
 });
 
 /**
- * Yeni bir istek gönderir ve işlenmek üzere kabul eder.
  * @route POST /submit
  * @body {object} payload - İşlenecek veri.
  * @returns {object} requestId ve kabul mesajı.
