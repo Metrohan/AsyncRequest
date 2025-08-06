@@ -40,10 +40,10 @@ app.use((req, res, next) => {
 
 /**
  * @route POST /submit
- * @body {object} payload - İşlenecek veri.
+ * @body {object} payload
  * @returns {object} requestId ve kabul mesajı.
- * @throws {InvalidInputError} Boş veya geçersiz yük.
- * @throws {AppError} Dahili sunucu hataları.
+ * @throws {InvalidInputError}
+ * @throws {AppError}
  */
 app.post('/submit', async (req, res, next) => {
     const requestId = uuidv4();
@@ -79,13 +79,12 @@ app.post('/submit', async (req, res, next) => {
 });
 
 /**
- * Bir isteğin durumunu ID'sine göre getirir.
  * @route GET /status/:id
- * @param {string} id - İstek ID'si (UUID).
- * @returns {object} İstek detayları.
- * @throws {InvalidInputError} Geçersiz istek ID formatı.
- * @throws {NotFoundError} İstek bulunamadı.
- * @throws {AppError} Dahili sunucu hataları.
+ * @param {string} id
+ * @returns {object}
+ * @throws {InvalidInputError}
+ * @throws {NotFoundError}
+ * @throws {AppError}
  */
 app.get('/status/:id', async (req, res, next) => {
     const requestId = req.params.id;
@@ -103,7 +102,6 @@ app.get('/status/:id', async (req, res, next) => {
 });
 
 /**
- * Prometheus metrik endpoint'i.
  * @route GET /metrics
  * @returns {string} Prometheus metrikleri.
  */

@@ -20,11 +20,10 @@ pool.on('error', (err) => {
 });
 
 /**
- * Veritabanına sorgu gönderir.
- * @param {string} sqlText - SQL sorgu metni.
- * @param {Array<any>} [params=[]] - Sorguya geçirilecek parametreler.
- * @returns {Promise<import('pg').QueryResult>} Sorgu sonucu.
- * @throws {DatabaseError} Veritabanı sorgusu sırasında hata oluşursa.
+ * @param {string} sqlText
+ * @param {Array<any>} [params=[]]
+ * @returns {Promise<import('pg').QueryResult>}
+ * @throws {DatabaseError}
  */
 async function executeQuery(sqlText, params = []) {
     const startTime = Date.now();
@@ -40,8 +39,6 @@ async function executeQuery(sqlText, params = []) {
 }
 
 /**
- * Veritabanı bağlantı havuzunu döndürür.
- * Metrikler için kullanılır.
  * @returns {import('pg').Pool}
  */
 function getDatabasePool() {

@@ -114,6 +114,7 @@ Yük testi senaryosu `k6` ile yazılmıştır. `submit-test.js` dosyasında:
 - Test sırasında polling uygulanarak başarı durumları daha doğru şekilde belirlenir.
 
 ```bash
+cd ./load-tests/
 docker run --rm -i -v ${PWD}:/scripts grafana/k6 run /scripts/submit-test.js
 ```
 

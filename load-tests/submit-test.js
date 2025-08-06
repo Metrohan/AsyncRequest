@@ -1,9 +1,14 @@
 import http from 'k6/http';
 import { sleep, check } from 'k6';
 
+const TEST_ID = new Date().toISOString(); 
+
 export let options = {
   vus: 1000,
   duration: '1m',
+  tags: {
+    test_id: TEST_ID,
+  },
 };
 
 export default function () {
@@ -22,14 +27,12 @@ export default function () {
     return;
   }
 
-  // Durum kontrolü için 5 deneme yap (her biri 1 saniye arayla)
   let success = false;
   for (let i = 0; i < 5; i++) {
     const res2 = http.get(`http://host.docker.internal:3001/status/${requestId}`);
     const ok = check(res2, {
       'status check is 200': (r) => r.status === 200,
     });
-
     if (ok) {
       success = true;
       break;
@@ -41,6 +44,7 @@ export default function () {
   if (!success) {
     console.warn(`Status never became 200 for ID ${requestId}`);
   }
+  
 
   sleep(1);
 }

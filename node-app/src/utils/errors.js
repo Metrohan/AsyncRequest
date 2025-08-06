@@ -1,5 +1,4 @@
 /**
- * Temel uygulama hatası sınıfı.
  * @class AppError
  * @extends Error
  */
@@ -13,7 +12,6 @@ class AppError extends Error {
 }
 
 /**
- * Geçersiz giriş hatası sınıfı.
  * @class InvalidInputError
  * @extends AppError
  */
@@ -25,7 +23,6 @@ class InvalidInputError extends AppError {
 }
 
 /**
- * Kaynak bulunamadı hatası sınıfı.
  * @class NotFoundError
  * @extends AppError
  */
@@ -36,19 +33,17 @@ class NotFoundError extends AppError {
 }
 
 /**
- * Harici servis çağrısı hatası sınıfı.
  * @class ExternalServiceError
  * @extends AppError
  */
 class ExternalServiceError extends AppError {
     constructor(message = 'Harici servis çağrısı sırasında hata oluştu.', details = null) {
-        super(message, 503); // Service Unavailable
+        super(message, 503);
         this.details = details;
     }
 }
 
 /**
- * Veritabanı hatası sınıfı.
  * @class DatabaseError
  * @extends AppError
  */

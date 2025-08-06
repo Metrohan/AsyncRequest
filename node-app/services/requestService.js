@@ -11,15 +11,14 @@ const { DatabaseError, ExternalServiceError, NotFoundError } = require('../src/u
 const { processedRequestsCounter } = require('../infrastructure/metrics');
 
 const asyncPool = require('tiny-async-pool');
-const CONCURRENCY_LIMIT = 4; // Aynı anda çalışacak görev sayısı
+const CONCURRENCY_LIMIT = 4;
 
 class RequestService {
     /**
-     * Yeni bir istek oluşturur ve veritabanına kaydeder.
-     * @param {string} requestId - Yeni oluşturulan istek ID'si.
-     * @param {object} payload - İstek yükü.
-     * @returns {Promise<Request>} Kaydedilen değişmez Request nesnesi.
-     * @throws {DatabaseError} Veritabanı işlemi sırasında hata oluşursa.
+     * @param {string} requestId
+     * @param {object} payload
+     * @returns {Promise<Request>}
+     * @throws {DatabaseError}
      */
     async createRequest(requestId, payload) {
         const newRequest = new Request({
@@ -41,9 +40,7 @@ class RequestService {
     }
 
     /**
-     * 3. parti servisi çağırır ve isteğin durumunu günceller.
-     * Bu fonksiyon, API yanıtı hemen döndükten sonra asenkron olarak çalışır.
-     * @param {Request} initialRequest - Başlangıçtaki değişmez Request nesnesi.
+     * @param {Request} initialRequest
      */
      async processRequestAsync(initialRequest) {
         await asyncPool(CONCURRENCY_LIMIT, [initialRequest], async (request) => {
@@ -57,7 +54,7 @@ class RequestService {
                     request.getPayload()
                 );
 
-                newStatus = thirdPartyResponseData.status === 'SUCCESS' // REQUEST_STATUS_SUCCESS yerine 'SUCCESS' stringi kullanıldı
+                newStatus = thirdPartyResponseData.status === 'SUCCESS'
                     ? REQUEST_STATUS_COMPLETED
                     : REQUEST_STATUS_FAILED;
 
@@ -97,11 +94,10 @@ class RequestService {
     }
 
     /**
-     * Bir isteği ID'sine göre getirir.
-     * @param {string} requestId - İstek ID'si.
-     * @returns {Promise<Request>} Bulunan değişmez Request nesnesi.
-     * @throws {NotFoundError} İstek bulunamazsa.
-     * @throws {DatabaseError} Veritabanı işlemi sırasında hata oluşursa.
+     * @param {string} requestId
+     * @returns {Promise<Request>}
+     * @throws {NotFoundError}
+     * @throws {DatabaseError}
      */
     async getRequestStatus(requestId) {
         try {

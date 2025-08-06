@@ -56,7 +56,6 @@ register.registerMetric(cpuUsageGauge);
 register.registerMetric(memoryUsageGauge);
 
 /**
- * Veritabanı bağlantı havuzu metriklerini günceller.
  * @function updateDbPoolMetrics
  */
 const updateDbPoolMetrics = () => {
@@ -75,12 +74,11 @@ const updateDbPoolMetrics = () => {
 
 const updateProcessMetrics = () => {
     const memoryUsage = process.memoryUsage().rss;
-    const cpuUsage = process.cpuUsage(); // { user, system }
+    const cpuUsage = process.cpuUsage();
 
-    // % CPU tahmini: 1 saniyede geçen CPU süresi / gerçek süre
     const userCPUms = cpuUsage.user / 1000;
     const systemCPUms = cpuUsage.system / 1000;
-    const cpuPercent = (userCPUms + systemCPUms) / 1000; // yaklaşık %1 = 1 çekirdek kullanım
+    const cpuPercent = (userCPUms + systemCPUms) / 1000;
 
     cpuUsageGauge.set(cpuPercent);
     memoryUsageGauge.set(memoryUsage);

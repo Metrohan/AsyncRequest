@@ -8,11 +8,10 @@ const {
 const { ExternalServiceError } = require('../src/utils/errors');
 
 /**
- * Üçüncü parti servisi simüle eden fonksiyon.
- * @param {string} requestId - İstek ID'si.
- * @param {object} payload - İstek yükü.
- * @returns {Promise<object>} Servis yanıtı.
- * @throws {ExternalServiceError} Mock servis çağrısı başarısız olursa.
+ * @param {string} requestId
+ * @param {object} payload
+ * @returns {Promise<object>}
+ * @throws {ExternalServiceError}
  */
 async function callThirdPartyService(requestId, payload) {
     console.log(`[MOCK - ${requestId}] Mock third-party service call started...`);

@@ -7,14 +7,13 @@ class Request {
     #thirdPartyResponse;
 
     /**
-     * Yeni bir Request nesnesi oluşturur.
-     * @param {object} params - İstek parametreleri.
-     * @param {string} params.id - İstek ID'si (UUID).
-     * @param {object} params.payload - İstekle gönderilen yük.
-     * @param {string} params.status - İstek durumu (örneğin 'pending', 'completed', 'failed').
-     * @param {Date} [params.receivedAt=new Date()] - İstek alınma zamanı.
-     * @param {Date|null} [params.processedAt=null] - İstek işlenme zamanı.
-     * @param {object|null} [params.thirdPartyResponse=null] - 3. parti servis yanıtı.
+     * @param {object} params
+     * @param {string} params.id
+     * @param {object} params.payload
+     * @param {string} params.status
+     * @param {Date} [params.receivedAt=new Date()]
+     * @param {Date|null} [params.processedAt=null]
+     * @param {object|null} [params.thirdPartyResponse=null]
      */
     constructor({ id, payload, status, receivedAt = new Date(), processedAt = null, thirdPartyResponse = null }) {
         if (!id || !payload || !status) {
@@ -39,8 +38,6 @@ class Request {
     getThirdPartyResponse() { return this.#thirdPartyResponse; }
 
     /**
-     * Yeni bir durumla yeni bir Request nesnesi döndürür.
-     * "With" metodu prensibi.
      * @param {string} newStatus
      * @param {object|null} [newThirdPartyResponse=null]
      * @returns {Request}
@@ -57,8 +54,6 @@ class Request {
     }
 
     /**
-     * Request nesnesini düz JavaScript objesine dönüştürür.
-     * Veritabanı veya API yanıtı için kullanılabilir.
      * @returns {object}
      */
     toObject() {
