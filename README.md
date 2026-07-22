@@ -1,3 +1,7 @@
+> **Project Status: Active**
+>
+> This project is actively maintained. Current priorities and planned work are documented below or in GitHub Issues.
+
 # Asenkron İstek İşleme ve Performans İzleme Servisi
 
 Team A: Metehan GÜNEN, A. Baran DİKMEN, Neriman AKÇA, Mustafa YILDIRIM, H. Melih YEŞİL
@@ -127,4 +131,3 @@ docker run --rm -i -v ${PWD}:/scripts grafana/k6 run /scripts/submit-test.js
 
 - Test kapsamı ve merkezi loglama
 - Dokümantasyon hazırlama ve raporlama
-
